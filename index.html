@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Team-Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      background: #f5f7fb;
+      color: #222;
+    }
+
+    header {
+      background: #27ae60;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 20px auto 40px;
+      padding: 0 15px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    .player-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .player-form input[type="text"] {
+      flex: 1 1 220px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .player-form label {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .player-form button {
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #27ae60;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .player-form button:hover {
+      filter: brightness(1.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #ecf9f1;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e3e6ee;
+      padding: 6px 4px;
+      text-align: left;
+    }
+
+    th {
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .number-input {
+      width: 60px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: #27ae60;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+      color: #fff;
+    }
+
+    .btn + .btn {
+      margin-left: 6px;
+    }
+
+    .teams-inputs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .teams-inputs input {
+      width: 80px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-gk {
+      background: #f39c12;
+      color: #fff;
+    }
+
+    .team-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .team-card {
+      border-radius: 8px;
+      border: 1px solid #e1e4ee;
+      padding: 10px 10px 12px;
+      background: #fafbff;
+    }
+
+    .team-card h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+
+    .team-card small {
+      color: #555;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    ul.player-list {
+      list-style: none;
+      padding-left: 14px;
+      margin: 0;
+    }
+
+    ul.player-list li {
+      margin-bottom: 3px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .warning {
+      color: #c0392b;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 17px;
+      }
+      .card {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Namens- &amp; Team-Generator</h1>
+  <div style="font-size:13px;">Spieler wählen → Stärken vergeben → Teams bilden</div>
+</header>
+
+<main>
+  <!-- Spieler verwalten -->
+  <section class="card">
+    <h2>Spieler verwalten</h2>
+
+    <div class="player-form">
+      <input id="newPlayerName" type="text" placeholder="Neuen Spieler hinzufügen (Name)" />
+      <label>
+        <input id="newPlayerGk" type="checkbox" />
+        Torhüter
+      </label>
+      <button id="addPlayerBtn" type="button">Spieler hinzufügen</button>
+    </div>
+    <div class="hint">Die Liste wird automatisch im Browser (localStorage) gespeichert.</div>
+
+    <div style="overflow-x:auto; margin-top:10px;">
+      <table id="playersTable">
+        <thead>
+          <tr>
+            <th class="center">Aktiv</th>
+            <th>Spieler</th>
+            <th class="center">Torhüter</th>
+            <th class="center">Stärke (0–10)</th>
+            <th class="center">Löschen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- wird per JS gefüllt -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Teams bilden -->
+  <section class="card">
+    <h2>Teams bilden</h2>
+    <div id="message" class="warning" style="display:none;"></div>
+    <div class="teams-inputs">
+      <label for="teamCount">Anzahl Teams:</label>
+      <input id="teamCount" type="number" min="1" value="2" />
+      <button id="generateBtn" type="button" class="btn btn-primary">Teams erzeugen</button>
+      <button id="clearStorageBtn" type="button" class="btn btn-secondary">Speicher leeren</button>
+    </div>
+    <div class="hint">
+      Paul Berndt und Noel sind als Torhüter markiert. Beim Team-Building bekommt jedes Team zunächst einen Torwart (wenn genug vorhanden). Danach wird nach Stärke ausgeglichen.
+    </div>
+  </section>
+
+  <!-- Ergebnis -->
+  <section class="card">
+    <h2>Ergebnis</h2>
+    <div id="teamsOutput">Noch keine Teams erzeugt.</div>
+  </section>
+</main>
+
+<script>
+  // --- Datenmodell & LocalStorage -----------------------------------
+  const STORAGE_KEY = "teamGeneratorPlayers_v1";
+
+  let players = [];
+
+  function defaultPlayers() {
+    return [
+      { id: 1, name: "Paul Berndt", isGoalkeeper: true,  strength: 8, selected: true },
+      { id: 2, name: "Ahmet",       isGoalkeeper: false, strength: 7, selected: true },
+      { id: 3, name: "Aos",         isGoalkeeper: false, strength: 7, selected: true },
+      { id: 4, name: "David",       isGoalkeeper: false, strength: 7, selected: true },
+      { id: 5, name: "Efe",         isGoalkeeper: false, strength: 8, selected: true },
+      { id: 6, name: "Elias",       isGoalkeeper: false, strength: 6, selected: true },
+      { id: 7, name: "Jannik",      isGoalkeeper: false, strength: 7, selected: true },
+      { id: 8, name: "Jonas",       isGoalkeeper: false, strength: 6, selected: true },
+      { id: 9, name: "Julian",      isGoalkeeper: false, strength: 6, selected: true },
+      { id:10, name: "Kirill",      isGoalkeeper: false, strength: 6, selected: true },
+      { id:11, name: "Malik",       isGoalkeeper: false, strength: 7, selected: true },
+      { id:12, name: "Mario",       isGoalkeeper: false, strength: 6, selected: true },
+      { id:13, name: "Noel",        isGoalkeeper: true,  strength: 8, selected: true },
+      { id:14, name: "Paul Herholz",isGoalkeeper: false, strength: 7, selected: true },
+      { id:15, name: "Piotrek",     isGoalkeeper: false, strength: 6, selected: true },
+      { id:16, name: "Semih",       isGoalkeeper: false, strength: 7, selected: true }
+    ];
+  }
+
+  function loadPlayers() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        players = defaultPlayers();
+      } else {
+        players = JSON.parse(raw);
+      }
+    } catch (e) {
+      players = defaultPlayers();
+    }
+  }
+
+  function savePlayers() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
+  }
+
+  // --- UI Rendering --------------------------------------------------
+  const playersTableBody = document.querySelector("#playersTable tbody");
+  const newPlayerNameInput = document.getElementById("newPlayerName");
+  const newPlayerGkCheckbox = document.getElementById("newPlayerGk");
+  const messageBox = document.getElementById("message");
+  const teamsOutput = document.getElementById("teamsOutput");
+
+  function renderPlayers() {
+    playersTableBody.innerHTML = "";
+    players.forEach(player => {
+      const tr = document.createElement("tr");
+
+      // Aktiv
+      const tdActive = document.createElement("td");
+      tdActive.className = "center";
+      const cbActive = document.createElement("input");
+      cbActive.type = "checkbox";
+      cbActive.checked = player.selected;
+      cbActive.addEventListener("change", () => {
+        player.selected = cbActive.checked;
+        savePlayers();
+      });
+      tdActive.appendChild(cbActive);
+      tr.appendChild(tdActive);
+
+      // Name
+      const tdName = document.createElement("td");
+      const inputName = document.createElement("input");
+      inputName.type = "text";
+      inputName.value = player.name;
+      inputName.style.width = "100%";
+      inputName.addEventListener("input", () => {
+        player.name = inputName.value;
+        savePlayers();
+      });
+      tdName.appendChild(inputName);
+      tr.appendChild(tdName);
+
+      // GK
+      const tdGk = document.createElement("td");
+      tdGk.className = "center";
+      const cbGk = document.createElement("input");
+      cbGk.type = "checkbox";
+      cbGk.checked = player.isGoalkeeper;
+      cbGk.addEventListener("change", () => {
+        player.isGoalkeeper = cbGk.checked;
+        savePlayers();
+      });
+      tdGk.appendChild(cbGk);
+      tr.appendChild(tdGk);
+
+      // Stärke
+      const tdStrength = document.createElement("td");
+      tdStrength.className = "center";
+      const inputStrength = document.createElement("input");
+      inputStrength.type = "number";
+      inputStrength.min = "0";
+      inputStrength.max = "10";
+      inputStrength.value = player.strength;
+      inputStrength.className = "number-input";
+      inputStrength.addEventListener("change", () => {
+        const val = parseInt(inputStrength.value, 10);
+        player.strength = isNaN(val) ? 0 : Math.max(0, Math.min(10, val));
+        inputStrength.value = player.strength;
+        savePlayers();
+      });
+      tdStrength.appendChild(inputStrength);
+      tr.appendChild(tdStrength);
+
+      // Delete
+      const tdDelete = document.createElement("td");
+      tdDelete.className = "center";
+      const btnDelete = document.createElement("button");
+      btnDelete.type = "button";
+      btnDelete.textContent = "X";
+      btnDelete.className = "btn btn-danger";
+      btnDelete.style.padding = "3px 8px";
+      btnDelete.addEventListener("click", () => {
+        players = players.filter(p => p.id !== player.id);
+        savePlayers();
+        renderPlayers();
+      });
+      tdDelete.appendChild(btnDelete);
+      tr.appendChild(tdDelete);
+
+      playersTableBody.appendChild(tr);
+    });
+  }
+
+  // --- Spieler hinzufügen --------------------------------------------
+  document.getElementById("addPlayerBtn").addEventListener("click", () => {
+    const name = newPlayerNameInput.value.trim();
+    if (!name) return;
+
+    const newId = players.length ? Math.max(...players.map(p => p.id)) + 1 : 1;
+    players.push({
+      id: newId,
+      name: name,
+      isGoalkeeper: newPlayerGkCheckbox.checked,
+      strength: 5,
+      selected: true
+    });
+    newPlayerNameInput.value = "";
+    newPlayerGkCheckbox.checked = false;
+    savePlayers();
+    renderPlayers();
+  });
+
+  // --- Hilfsfunktionen -----------------------------------------------
+  function shuffleArray(arr) {
+    // Fisher–Yates
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // --- Teams erzeugen ------------------------------------------------
+  document.getElementById("generateBtn").addEventListener("click", () => {
+    messageBox.style.display = "none";
+    messageBox.textContent = "";
+
+    const teamCountInput = document.getElementById("teamCount");
+    let teamCount = parseInt(teamCountInput.value, 10);
+    if (isNaN(teamCount) || teamCount < 1) {
+      teamCount = 1;
+      teamCountInput.value = "1";
+    }
+
+    const activePlayers = players.filter(p => p.selected);
+    if (activePlayers.length < teamCount) {
+      showMessage("Zu wenig aktive Spieler für " + teamCount + " Teams.", true);
+      teamsOutput.textContent = "Keine Teams erzeugt.";
+      return;
+    }
+
+    const gks = activePlayers.filter(p => p.isGoalkeeper);
+    if (gks.length < teamCount) {
+      showMessage("Achtung: Es sind nur " + gks.length +
+        " Torhüter aktiv für " + teamCount + " Teams. Einige Teams haben keinen Torwart.", true);
+    }
+
+    // Teams initialisieren
+    const teams = [];
+    for (let i = 0; i < teamCount; i++) {
+      teams.push({ players: [], totalStrength: 0 });
+    }
+
+    // 1. Torhüter verteilen (max. ein Torwart pro Team)
+    const shuffledGks = shuffleArray(gks);
+    for (let i = 0; i < teamCount && i < shuffledGks.length; i++) {
+      teams[i].players.push(shuffledGks[i]);
+      teams[i].totalStrength += shuffledGks[i].strength;
+    }
+
+    // Restliche Spieler (ohne die verteilten GKs)
+    const remaining = activePlayers.filter(p => !shuffledGks.includes(p));
+    // Stärkste zuerst
+    remaining.sort((a, b) => b.strength - a.strength);
+
+    // 2. Snake-Draft: immer zum Team mit aktuell geringster Gesamtstärke
+    remaining.forEach(player => {
+      let bestIndex = 0;
+      let minStrength = teams[0].totalStrength;
+      for (let i = 1; i < teams.length; i++) {
+        if (teams[i].totalStrength < minStrength) {
+          minStrength = teams[i].totalStrength;
+          bestIndex = i;
+        }
+      }
+      teams[bestIndex].players.push(player);
+      teams[bestIndex].totalStrength += player.strength;
+    });
+
+    renderTeams(teams);
+  });
+
+  function showMessage(text, isWarning = false) {
+    messageBox.textContent = text;
+    messageBox.style.display = "block";
+    messageBox.style.color = isWarning ? "#c0392b" : "#27ae60";
+  }
+
+  function renderTeams(teams) {
+    const container = document.createElement("div");
+    container.className = "team-container";
+
+    teams.forEach((team, idx) => {
+      const card = document.createElement("div");
+      card.className = "team-card";
+
+      const totalPlayers = team.players.length;
+      const avgStrength = totalPlayers
+        ? (team.totalStrength / totalPlayers).toFixed(1)
+        : "0.0";
+
+      const title = document.createElement("h3");
+      title.textContent = "Team " + (idx + 1);
+      card.appendChild(title);
+
+      const info = document.createElement("small");
+      info.textContent =
+        "Spieler: " + totalPlayers +
+        " · Gesamtpunkte: " + team.totalStrength +
+        " · Ø Stärke: " + avgStrength;
+      card.appendChild(info);
+
+      const list = document.createElement("ul");
+      list.className = "player-list";
+
+      team.players.forEach(p => {
+        const li = document.createElement("li");
+        li.innerHTML =
+          (p.isGoalkeeper
+            ? "<span class='badge badge-gk'>TW</span> "
+            : "") +
+          p.name + " (" + p.strength + ")";
+        list.appendChild(li);
+      });
+
+      card.appendChild(list);
+      container.appendChild(card);
+    });
+
+    teamsOutput.innerHTML = "";
+    teamsOutput.appendChild(container);
+  }
+
+  // Speicher leeren
+  document.getElementById("clearStorageBtn").addEventListener("click", () => {
+    if (confirm("Wirklich gespeicherte Daten (Spielerliste) löschen?")) {
+      localStorage.removeItem(STORAGE_KEY);
+      loadPlayers();
+      renderPlayers();
+      teamsOutput.textContent = "Noch keine Teams erzeugt.";
+      messageBox.style.display = "none";
+    }
+  });
+
+  // --- Init ----------------------------------------------------------
+  loadPlayers();
+  renderPlayers();
+</script>
+</body>
+</html>
