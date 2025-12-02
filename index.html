@@ -226,7 +226,8 @@
       <button id="addPlayerBtn" type="button">Spieler hinzufügen</button>
     </div>
     <div class="hint">
-      Alle Daten werden nur lokal im Browser (localStorage) gespeichert.
+      Alle Daten werden nur lokal im Browser (localStorage) gespeichert.<br>
+      Extra-Regel: <strong>Jannik &amp; Julian kommen nie ins gleiche Team (ab 2 Teams).</strong>
     </div>
 
     <div style="overflow-x:auto; margin-top:10px;">
@@ -259,7 +260,7 @@
       <button id="clearStorageBtn" type="button" class="btn btn-secondary">Speicher leeren</button>
     </div>
     <div class="hint">
-      Rollen: <strong>Defensiv</strong>, <strong>Offensiv</strong> oder <strong>Allround</strong>.  
+      Rollen: <strong>Defensiv</strong>, <strong>Offensiv</strong> oder <strong>Allround</strong>.<br>
       Verteidiger werden ungefähr gleich verteilt, Teams bleiben aber zufällig.
     </div>
   </section>
@@ -272,7 +273,7 @@
 </main>
 
 <script>
-  const STORAGE_KEY = "teamGeneratorPlayers_v3";
+  const STORAGE_KEY = "teamGeneratorPlayers_v4";
   let players = [];
 
   function defaultPlayers() {
@@ -447,15 +448,12 @@
     return a;
   }
 
-  // Verteidiger mit Zufall & ungefähr gleicher Anzahl
   function distributeDefenseRandom(defenders, teams) {
     const sorted = defenders.slice().sort((a, b) => b.strength - a.strength);
-
     sorted.forEach(player => {
       let idx;
-
       if (Math.random() < 0.7) {
-        // 70%: Team mit den wenigsten Defensiven (bei Gleichstand zufällig)
+        // 70%: Team mit wenigsten Defensiven (bei Gleichstand zufälliges unter denen)
         let minDef = teams[0].defenders;
         let candidates = [0];
         for (let i = 1; i < teams.length; i++) {
@@ -468,7 +466,7 @@
         }
         idx = candidates[Math.floor(Math.random() * candidates.length)];
       } else {
-        // 30%: komplett zufälliges Team
+        // 30%: komplett random
         idx = Math.floor(Math.random() * teams.length);
       }
 
@@ -478,10 +476,8 @@
     });
   }
 
-  // Offensiv & Allround: leicht ausbalanciert, aber zufällig
   function distributeRandomWithStrength(list, teams) {
     const sorted = list.slice().sort((a, b) => b.strength - a.strength);
-
     sorted.forEach(player => {
       let idx;
       if (Math.random() < 0.6) {
@@ -495,13 +491,25 @@
           }
         }
       } else {
-        // 40%: komplett zufällig
+        // 40%: random
         idx = Math.floor(Math.random() * teams.length);
       }
-
       teams[idx].players.push(player);
       teams[idx].totalStrength += player.strength;
     });
+  }
+
+  function placeSpecialPlayer(player, team, teams) {
+    teams[team].players.push(player);
+    teams[team].totalStrength += player.strength;
+    if (!player.isGoalkeeper && player.role === "defense") {
+      teams[team].defenders += 1;
+    }
+  }
+
+  function removeFromArray(arr, player) {
+    const idx = arr.indexOf(player);
+    if (idx !== -1) arr.splice(idx, 1);
   }
 
   // Teams erzeugen
@@ -533,11 +541,31 @@
       );
     }
 
+    // Jannik & Julian finden (nach Namen, nicht case-sensitiv)
+    const jannik = activePlayers.find(
+      p => p.name.toLowerCase().startsWith("jannik")
+    );
+    const julian = activePlayers.find(
+      p => p.name.toLowerCase().startsWith("julian")
+    );
+
     const defenders = activePlayers.filter(p => !p.isGoalkeeper && p.role === "defense");
     const offensives = activePlayers.filter(p => !p.isGoalkeeper && p.role === "offense");
     const others = activePlayers.filter(
       p => !p.isGoalkeeper && (p.role === "neutral" || !p.role)
     );
+
+    // Damit sie später nicht doppelt verteilt werden
+    if (jannik && !jannik.isGoalkeeper) {
+      removeFromArray(defenders, jannik);
+      removeFromArray(offensives, jannik);
+      removeFromArray(others, jannik);
+    }
+    if (julian && !julian.isGoalkeeper) {
+      removeFromArray(defenders, julian);
+      removeFromArray(offensives, julian);
+      removeFromArray(others, julian);
+    }
 
     // Teams initialisieren
     const teams = [];
@@ -553,10 +581,39 @@
       teams[i].totalStrength += gk.strength;
     }
 
-    // 2. Verteidiger (ungefähr gleich / mit Zufall)
+    // 2. Spezialregel: Jannik & Julian nie in gleichem Team (nur wenn ≥2 Teams & beide Feldspieler aktiv)
+    if (teamCount >= 2 && jannik && julian && !jannik.isGoalkeeper && !julian.isGoalkeeper) {
+      // Jannik in zufälliges Team
+      const jannikTeamIndex = Math.floor(Math.random() * teams.length);
+      placeSpecialPlayer(jannik, jannikTeamIndex, teams);
+
+      // Julian in anderes Team
+      const possibleTeams = [...Array(teams.length).keys()].filter(i => i !== jannikTeamIndex);
+      const julianTeamIndex = possibleTeams[Math.floor(Math.random() * possibleTeams.length)];
+      placeSpecialPlayer(julian, julianTeamIndex, teams);
+    } else {
+      // Wenn nur 1 Team: Hinweis, Regel kann nicht eingehalten werden
+      if (teamCount === 1 && jannik && julian) {
+        showMessage("Hinweis: Mit nur einem Team können Jannik & Julian nicht getrennt werden.", true);
+      }
+      // Wenn nur einer aktiv: wird ganz normal später im Pool verteilt
+      if (jannik && !jannik.isGoalkeeper && (!julian || teamCount === 1)) {
+        // wieder in seinen Pool zurückschieben
+        if (jannik.role === "defense") defenders.push(jannik);
+        else if (jannik.role === "offense") offensives.push(jannik);
+        else others.push(jannik);
+      }
+      if (julian && !julian.isGoalkeeper && (!jannik || teamCount === 1)) {
+        if (julian.role === "defense") defenders.push(julian);
+        else if (julian.role === "offense") offensives.push(julian);
+        else others.push(julian);
+      }
+    }
+
+    // 3. Verteidiger (ungefähr gleich / mit Zufall)
     distributeDefenseRandom(defenders, teams);
 
-    // 3. Offensiv & Allround (weicher Ausgleich + Zufall)
+    // 4. Offensiv & Allround (weicher Ausgleich + Zufall)
     distributeRandomWithStrength(offensives, teams);
     distributeRandomWithStrength(others, teams);
 
