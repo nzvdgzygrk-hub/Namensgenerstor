@@ -5,9 +5,7 @@
   <title>Team-Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
@@ -85,9 +83,7 @@
       font-size: 14px;
     }
 
-    .player-form button:hover {
-      filter: brightness(1.05);
-    }
+    .player-form button:hover { filter: brightness(1.05); }
 
     table {
       width: 100%;
@@ -95,9 +91,7 @@
       font-size: 14px;
     }
 
-    thead {
-      background: #ecf9f1;
-    }
+    thead { background: #ecf9f1; }
 
     th, td {
       border-bottom: 1px solid #e3e6ee;
@@ -105,17 +99,11 @@
       text-align: left;
     }
 
-    th {
-      font-weight: 600;
-    }
+    th { font-weight: 600; }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+    tr:last-child td { border-bottom: none; }
 
-    .number-input {
-      width: 60px;
-    }
+    .number-input { width: 60px; }
 
     select.role-select {
       width: 100%;
@@ -125,9 +113,7 @@
       font-size: 13px;
     }
 
-    .center {
-      text-align: center;
-    }
+    .center { text-align: center; }
 
     .btn {
       padding: 8px 16px;
@@ -138,24 +124,10 @@
       font-size: 14px;
     }
 
-    .btn-primary {
-      background: #27ae60;
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: #f0f0f0;
-      color: #333;
-    }
-
-    .btn-danger {
-      background: #e74c3c;
-      color: #fff;
-    }
-
-    .btn + .btn {
-      margin-left: 6px;
-    }
+    .btn-primary { background: #27ae60; color: #fff; }
+    .btn-secondary { background: #f0f0f0; color: #333; }
+    .btn-danger { background: #e74c3c; color: #fff; }
+    .btn + .btn { margin-left: 6px; }
 
     .teams-inputs {
       display: flex;
@@ -180,20 +152,9 @@
       font-weight: 600;
     }
 
-    .badge-gk {
-      background: #f39c12;
-      color: #fff;
-    }
-
-    .badge-def {
-      background: #3498db;
-      color: #fff;
-    }
-
-    .badge-off {
-      background: #e67e22;
-      color: #fff;
-    }
+    .badge-gk { background: #f39c12; color: #fff; }
+    .badge-def { background: #3498db; color: #fff; }
+    .badge-off { background: #e67e22; color: #fff; }
 
     .team-container {
       display: grid;
@@ -225,9 +186,7 @@
       margin: 0;
     }
 
-    ul.player-list li {
-      margin-bottom: 3px;
-    }
+    ul.player-list li { margin-bottom: 3px; }
 
     .hint {
       font-size: 12px;
@@ -242,12 +201,8 @@
     }
 
     @media (max-width: 600px) {
-      header h1 {
-        font-size: 17px;
-      }
-      .card {
-        padding: 14px;
-      }
+      header h1 { font-size: 17px; }
+      .card { padding: 14px; }
     }
   </style>
 </head>
@@ -280,14 +235,14 @@
           <tr>
             <th class="center">Aktiv</th>
             <th>Spieler</th>
-            <th class="center">Torhüter</th>
+            <th class="center">TW</th>
             <th>Rolle</th>
             <th class="center">Stärke (0–10)</th>
             <th class="center">Löschen</th>
           </tr>
         </thead>
         <tbody>
-          <!-- wird per JS gefüllt -->
+          <!-- per JS -->
         </tbody>
       </table>
     </div>
@@ -304,9 +259,8 @@
       <button id="clearStorageBtn" type="button" class="btn btn-secondary">Speicher leeren</button>
     </div>
     <div class="hint">
-      Paul Berndt und Noel sind als Torhüter markiert.  
-      Rolle: <strong>Defensiv</strong>, <strong>Offensiv</strong> oder <strong>Allround</strong>.  
-      Verteidiger werden möglichst gleichmäßig auf die Teams verteilt.
+      Rollen: <strong>Defensiv</strong>, <strong>Offensiv</strong> oder <strong>Allround</strong>.  
+      Verteidiger werden ungefähr gleich verteilt, Teams bleiben aber zufällig.
     </div>
   </section>
 
@@ -318,9 +272,7 @@
 </main>
 
 <script>
-  // --- Datenmodell & LocalStorage -----------------------------------
-  const STORAGE_KEY = "teamGeneratorPlayers_v2";
-
+  const STORAGE_KEY = "teamGeneratorPlayers_v3";
   let players = [];
 
   function defaultPlayers() {
@@ -347,11 +299,7 @@
   function loadPlayers() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        players = defaultPlayers();
-      } else {
-        players = JSON.parse(raw);
-      }
+      players = raw ? JSON.parse(raw) : defaultPlayers();
     } catch (e) {
       players = defaultPlayers();
     }
@@ -361,7 +309,6 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
   }
 
-  // --- UI Rendering --------------------------------------------------
   const playersTableBody = document.querySelector("#playersTable tbody");
   const newPlayerNameInput = document.getElementById("newPlayerName");
   const newPlayerGkCheckbox = document.getElementById("newPlayerGk");
@@ -373,7 +320,7 @@
     players.forEach(player => {
       const tr = document.createElement("tr");
 
-      // Aktiv
+      // aktiv
       const tdActive = document.createElement("td");
       tdActive.className = "center";
       const cbActive = document.createElement("input");
@@ -386,7 +333,7 @@
       tdActive.appendChild(cbActive);
       tr.appendChild(tdActive);
 
-      // Name
+      // name
       const tdName = document.createElement("td");
       const inputName = document.createElement("input");
       inputName.type = "text";
@@ -399,7 +346,7 @@
       tdName.appendChild(inputName);
       tr.appendChild(tdName);
 
-      // GK
+      // TW
       const tdGk = document.createElement("td");
       tdGk.className = "center";
       const cbGk = document.createElement("input");
@@ -421,8 +368,7 @@
         opt.value = val;
         opt.textContent =
           val === "defense" ? "Defensiv" :
-          val === "offense" ? "Offensiv" :
-          "Allround";
+          val === "offense" ? "Offensiv" : "Allround";
         selectRole.appendChild(opt);
       });
       selectRole.value = player.role || "neutral";
@@ -451,7 +397,7 @@
       tdStrength.appendChild(inputStrength);
       tr.appendChild(tdStrength);
 
-      // Delete
+      // löschen
       const tdDelete = document.createElement("td");
       tdDelete.className = "center";
       const btnDelete = document.createElement("button");
@@ -471,7 +417,7 @@
     });
   }
 
-  // --- Spieler hinzufügen --------------------------------------------
+  // Spieler hinzufügen
   document.getElementById("addPlayerBtn").addEventListener("click", () => {
     const name = newPlayerNameInput.value.trim();
     if (!name) return;
@@ -479,7 +425,7 @@
     const newId = players.length ? Math.max(...players.map(p => p.id)) + 1 : 1;
     players.push({
       id: newId,
-      name: name,
+      name,
       isGoalkeeper: newPlayerGkCheckbox.checked,
       role: "neutral",
       strength: 5,
@@ -491,7 +437,74 @@
     renderPlayers();
   });
 
-  // --- Teams erzeugen ------------------------------------------------
+  // Zufalls-Helfer
+  function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Verteidiger mit Zufall & ungefähr gleicher Anzahl
+  function distributeDefenseRandom(defenders, teams) {
+    const sorted = defenders.slice().sort((a, b) => b.strength - a.strength);
+
+    sorted.forEach(player => {
+      let idx;
+
+      if (Math.random() < 0.7) {
+        // 70%: Team mit den wenigsten Defensiven (bei Gleichstand zufällig)
+        let minDef = teams[0].defenders;
+        let candidates = [0];
+        for (let i = 1; i < teams.length; i++) {
+          if (teams[i].defenders < minDef) {
+            minDef = teams[i].defenders;
+            candidates = [i];
+          } else if (teams[i].defenders === minDef) {
+            candidates.push(i);
+          }
+        }
+        idx = candidates[Math.floor(Math.random() * candidates.length)];
+      } else {
+        // 30%: komplett zufälliges Team
+        idx = Math.floor(Math.random() * teams.length);
+      }
+
+      teams[idx].players.push(player);
+      teams[idx].totalStrength += player.strength;
+      teams[idx].defenders += 1;
+    });
+  }
+
+  // Offensiv & Allround: leicht ausbalanciert, aber zufällig
+  function distributeRandomWithStrength(list, teams) {
+    const sorted = list.slice().sort((a, b) => b.strength - a.strength);
+
+    sorted.forEach(player => {
+      let idx;
+      if (Math.random() < 0.6) {
+        // 60%: ins schwächste Team
+        let minStr = teams[0].totalStrength;
+        idx = 0;
+        for (let i = 1; i < teams.length; i++) {
+          if (teams[i].totalStrength < minStr) {
+            minStr = teams[i].totalStrength;
+            idx = i;
+          }
+        }
+      } else {
+        // 40%: komplett zufällig
+        idx = Math.floor(Math.random() * teams.length);
+      }
+
+      teams[idx].players.push(player);
+      teams[idx].totalStrength += player.strength;
+    });
+  }
+
+  // Teams erzeugen
   document.getElementById("generateBtn").addEventListener("click", () => {
     messageBox.style.display = "none";
     messageBox.textContent = "";
@@ -512,8 +525,12 @@
 
     const gks = activePlayers.filter(p => p.isGoalkeeper);
     if (gks.length < teamCount) {
-      showMessage("Achtung: Es sind nur " + gks.length +
-        " Torhüter aktiv für " + teamCount + " Teams. Einige Teams haben keinen Torwart.", true);
+      showMessage(
+        "Achtung: Nur " + gks.length +
+        " Torhüter für " + teamCount +
+        " Teams aktiv – einige Teams haben keinen TW.",
+        true
+      );
     }
 
     const defenders = activePlayers.filter(p => !p.isGoalkeeper && p.role === "defense");
@@ -528,7 +545,7 @@
       teams.push({ players: [], totalStrength: 0, defenders: 0 });
     }
 
-    // 1. Torhüter verteilen (max. ein TW pro Team)
+    // 1. Torhüter zufällig verteilen (max. einer pro Team)
     const shuffledGks = shuffleArray(gks);
     for (let i = 0; i < teamCount && i < shuffledGks.length; i++) {
       const gk = shuffledGks[i];
@@ -536,56 +553,15 @@
       teams[i].totalStrength += gk.strength;
     }
 
-    // 2. Defensiv-Spieler gerecht verteilen (Anzahl Def. pro Team ausgleichen)
-    defenders.sort((a, b) => b.strength - a.strength); // starke zuerst
-    defenders.forEach(player => {
-      let bestIndex = 0;
-      for (let i = 1; i < teams.length; i++) {
-        const t = teams[i];
-        const best = teams[bestIndex];
-        if (
-          t.defenders < best.defenders ||
-          (t.defenders === best.defenders && t.totalStrength < best.totalStrength)
-        ) {
-          bestIndex = i;
-        }
-      }
-      teams[bestIndex].players.push(player);
-      teams[bestIndex].totalStrength += player.strength;
-      teams[bestIndex].defenders += 1;
-    });
+    // 2. Verteidiger (ungefähr gleich / mit Zufall)
+    distributeDefenseRandom(defenders, teams);
 
-    // 3. Offensiv & Allround nach Gesamtstärke verteilen
-    distributeByStrength(offensives, teams);
-    distributeByStrength(others, teams);
+    // 3. Offensiv & Allround (weicher Ausgleich + Zufall)
+    distributeRandomWithStrength(offensives, teams);
+    distributeRandomWithStrength(others, teams);
 
     renderTeams(teams);
   });
-
-  function shuffleArray(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  function distributeByStrength(list, teams) {
-    const sorted = list.slice().sort((a, b) => b.strength - a.strength);
-    sorted.forEach(player => {
-      let bestIndex = 0;
-      let minStrength = teams[0].totalStrength;
-      for (let i = 1; i < teams.length; i++) {
-        if (teams[i].totalStrength < minStrength) {
-          minStrength = teams[i].totalStrength;
-          bestIndex = i;
-        }
-      }
-      teams[bestIndex].players.push(player);
-      teams[bestIndex].totalStrength += player.strength;
-    });
-  }
 
   function showMessage(text, isWarning = false) {
     messageBox.textContent = text;
@@ -615,7 +591,7 @@
         "Spieler: " + totalPlayers +
         " · Gesamtpunkte: " + team.totalStrength +
         " · Ø Stärke: " + avgStrength +
-        " · Defensiv-Spieler: " + team.defenders;
+        " · Defensiv: " + team.defenders;
       card.appendChild(info);
 
       const list = document.createElement("ul");
@@ -657,7 +633,7 @@
     }
   });
 
-  // --- Init ----------------------------------------------------------
+  // Init
   loadPlayers();
   renderPlayers();
 </script>
