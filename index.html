@@ -100,9 +100,7 @@
     }
 
     th { font-weight: 600; }
-
     tr:last-child td { border-bottom: none; }
-
     .number-input { width: 60px; }
 
     select.role-select {
@@ -203,6 +201,7 @@
     @media (max-width: 600px) {
       header h1 { font-size: 17px; }
       .card { padding: 14px; }
+      th, td { padding: 5px 3px; }
     }
   </style>
 </head>
@@ -213,7 +212,6 @@
 </header>
 
 <main>
-  <!-- Spieler verwalten -->
   <section class="card">
     <h2>Spieler verwalten</h2>
 
@@ -242,14 +240,11 @@
             <th class="center">Löschen</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- per JS -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
   </section>
 
-  <!-- Teams bilden -->
   <section class="card">
     <h2>Teams bilden</h2>
     <div id="message" class="warning" style="display:none;"></div>
@@ -265,7 +260,6 @@
     </div>
   </section>
 
-  <!-- Ergebnis -->
   <section class="card">
     <h2>Ergebnis</h2>
     <div id="teamsOutput">Noch keine Teams erzeugt.</div>
@@ -273,27 +267,30 @@
 </main>
 
 <script>
-  const STORAGE_KEY = "teamGeneratorPlayers_v4";
+  const STORAGE_KEY = "teamGeneratorPlayers_v5";
   let players = [];
 
   function defaultPlayers() {
     return [
-      { id: 1,  name: "Paul Berndt",  isGoalkeeper: true,  role: "defense", strength: 8, selected: true },
-      { id: 2,  name: "Ahmet",        isGoalkeeper: false, role: "defense", strength: 7, selected: true },
-      { id: 3,  name: "Aos",          isGoalkeeper: false, role: "offense", strength: 7, selected: true },
-      { id: 4,  name: "David",        isGoalkeeper: false, role: "defense", strength: 7, selected: true },
-      { id: 5,  name: "Efe",          isGoalkeeper: false, role: "offense", strength: 8, selected: true },
-      { id: 6,  name: "Elias",        isGoalkeeper: false, role: "defense", strength: 6, selected: true },
-      { id: 7,  name: "Jannik",       isGoalkeeper: false, role: "offense", strength: 7, selected: true },
-      { id: 8,  name: "Jonas",        isGoalkeeper: false, role: "defense", strength: 6, selected: true },
-      { id: 9,  name: "Julian",       isGoalkeeper: false, role: "offense", strength: 6, selected: true },
-      { id:10,  name: "Kirill",       isGoalkeeper: false, role: "defense", strength: 6, selected: true },
-      { id:11,  name: "Malik",        isGoalkeeper: false, role: "offense", strength: 7, selected: true },
-      { id:12,  name: "Mario",        isGoalkeeper: false, role: "defense", strength: 6, selected: true },
-      { id:13,  name: "Noel",         isGoalkeeper: true,  role: "defense", strength: 8, selected: true },
-      { id:14,  name: "Paul Herholz", isGoalkeeper: false, role: "offense", strength: 7, selected: true },
-      { id:15,  name: "Piotrek",      isGoalkeeper: false, role: "defense", strength: 6, selected: true },
-      { id:16,  name: "Semih",        isGoalkeeper: false, role: "offense", strength: 7, selected: true }
+      { id: 1,  name: "Paul B",   isGoalkeeper: true,  role: "defense", strength: 8, selected: true },
+      { id: 2,  name: "Ahmet",    isGoalkeeper: false, role: "defense", strength: 7, selected: true },
+      { id: 3,  name: "Aos",      isGoalkeeper: false, role: "offense", strength: 7, selected: true },
+      { id: 4,  name: "Benjamin", isGoalkeeper: true,  role: "defense", strength: 7, selected: true },
+      { id: 5,  name: "David",    isGoalkeeper: false, role: "defense", strength: 7, selected: true },
+      { id: 6,  name: "Efe",      isGoalkeeper: false, role: "offense", strength: 8, selected: true },
+      { id: 7,  name: "Elias",    isGoalkeeper: false, role: "defense", strength: 6, selected: true },
+      { id: 8,  name: "Jannik",   isGoalkeeper: false, role: "offense", strength: 7, selected: true },
+      { id: 9,  name: "Jonas",    isGoalkeeper: false, role: "defense", strength: 6, selected: true },
+      { id: 10, name: "Julian",   isGoalkeeper: false, role: "offense", strength: 6, selected: true },
+      { id: 11, name: "Kiril",    isGoalkeeper: false, role: "defense", strength: 6, selected: true },
+      { id: 12, name: "Malik",    isGoalkeeper: false, role: "offense", strength: 7, selected: true },
+      { id: 13, name: "Mario",    isGoalkeeper: false, role: "defense", strength: 6, selected: true },
+      { id: 14, name: "Mika",     isGoalkeeper: false, role: "neutral", strength: 6, selected: true },
+      { id: 15, name: "Noah",     isGoalkeeper: false, role: "offense", strength: 7, selected: true },
+      { id: 16, name: "Noel",     isGoalkeeper: true,  role: "defense", strength: 8, selected: true },
+      { id: 17, name: "Paul H",   isGoalkeeper: false, role: "offense", strength: 7, selected: true },
+      { id: 18, name: "Piotrek",  isGoalkeeper: false, role: "defense", strength: 6, selected: true },
+      { id: 19, name: "Semih",    isGoalkeeper: false, role: "offense", strength: 7, selected: true }
     ];
   }
 
@@ -321,7 +318,6 @@
     players.forEach(player => {
       const tr = document.createElement("tr");
 
-      // aktiv
       const tdActive = document.createElement("td");
       tdActive.className = "center";
       const cbActive = document.createElement("input");
@@ -334,7 +330,6 @@
       tdActive.appendChild(cbActive);
       tr.appendChild(tdActive);
 
-      // name
       const tdName = document.createElement("td");
       const inputName = document.createElement("input");
       inputName.type = "text";
@@ -347,7 +342,6 @@
       tdName.appendChild(inputName);
       tr.appendChild(tdName);
 
-      // TW
       const tdGk = document.createElement("td");
       tdGk.className = "center";
       const cbGk = document.createElement("input");
@@ -360,16 +354,13 @@
       tdGk.appendChild(cbGk);
       tr.appendChild(tdGk);
 
-      // Rolle
       const tdRole = document.createElement("td");
       const selectRole = document.createElement("select");
       selectRole.className = "role-select";
       ["defense", "offense", "neutral"].forEach(val => {
         const opt = document.createElement("option");
         opt.value = val;
-        opt.textContent =
-          val === "defense" ? "Defensiv" :
-          val === "offense" ? "Offensiv" : "Allround";
+        opt.textContent = val === "defense" ? "Defensiv" : val === "offense" ? "Offensiv" : "Allround";
         selectRole.appendChild(opt);
       });
       selectRole.value = player.role || "neutral";
@@ -380,7 +371,6 @@
       tdRole.appendChild(selectRole);
       tr.appendChild(tdRole);
 
-      // Stärke
       const tdStrength = document.createElement("td");
       tdStrength.className = "center";
       const inputStrength = document.createElement("input");
@@ -398,7 +388,6 @@
       tdStrength.appendChild(inputStrength);
       tr.appendChild(tdStrength);
 
-      // löschen
       const tdDelete = document.createElement("td");
       tdDelete.className = "center";
       const btnDelete = document.createElement("button");
@@ -418,7 +407,6 @@
     });
   }
 
-  // Spieler hinzufügen
   document.getElementById("addPlayerBtn").addEventListener("click", () => {
     const name = newPlayerNameInput.value.trim();
     if (!name) return;
@@ -438,7 +426,6 @@
     renderPlayers();
   });
 
-  // Zufalls-Helfer
   function shuffleArray(arr) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -448,28 +435,23 @@
     return a;
   }
 
+  function removeFromArray(arr, player) {
+    const idx = arr.indexOf(player);
+    if (idx !== -1) arr.splice(idx, 1);
+  }
+
+  function placeSpecialPlayer(player, teamIndex, teams) {
+    teams[teamIndex].players.push(player);
+    teams[teamIndex].totalStrength += player.strength;
+    if (!player.isGoalkeeper && player.role === "defense") teams[teamIndex].defenders += 1;
+  }
+
   function distributeDefenseRandom(defenders, teams) {
     const sorted = defenders.slice().sort((a, b) => b.strength - a.strength);
     sorted.forEach(player => {
-      let idx;
-      if (Math.random() < 0.7) {
-        // 70%: Team mit wenigsten Defensiven (bei Gleichstand zufälliges unter denen)
-        let minDef = teams[0].defenders;
-        let candidates = [0];
-        for (let i = 1; i < teams.length; i++) {
-          if (teams[i].defenders < minDef) {
-            minDef = teams[i].defenders;
-            candidates = [i];
-          } else if (teams[i].defenders === minDef) {
-            candidates.push(i);
-          }
-        }
-        idx = candidates[Math.floor(Math.random() * candidates.length)];
-      } else {
-        // 30%: komplett random
-        idx = Math.floor(Math.random() * teams.length);
-      }
-
+      let minDef = Math.min(...teams.map(t => t.defenders));
+      const candidates = teams.map((t, i) => t.defenders === minDef ? i : -1).filter(i => i >= 0);
+      const idx = Math.random() < 0.7 ? candidates[Math.floor(Math.random() * candidates.length)] : Math.floor(Math.random() * teams.length);
       teams[idx].players.push(player);
       teams[idx].totalStrength += player.strength;
       teams[idx].defenders += 1;
@@ -479,11 +461,9 @@
   function distributeRandomWithStrength(list, teams) {
     const sorted = list.slice().sort((a, b) => b.strength - a.strength);
     sorted.forEach(player => {
-      let idx;
+      let idx = 0;
       if (Math.random() < 0.6) {
-        // 60%: ins schwächste Team
         let minStr = teams[0].totalStrength;
-        idx = 0;
         for (let i = 1; i < teams.length; i++) {
           if (teams[i].totalStrength < minStr) {
             minStr = teams[i].totalStrength;
@@ -491,7 +471,6 @@
           }
         }
       } else {
-        // 40%: random
         idx = Math.floor(Math.random() * teams.length);
       }
       teams[idx].players.push(player);
@@ -499,20 +478,6 @@
     });
   }
 
-  function placeSpecialPlayer(player, team, teams) {
-    teams[team].players.push(player);
-    teams[team].totalStrength += player.strength;
-    if (!player.isGoalkeeper && player.role === "defense") {
-      teams[team].defenders += 1;
-    }
-  }
-
-  function removeFromArray(arr, player) {
-    const idx = arr.indexOf(player);
-    if (idx !== -1) arr.splice(idx, 1);
-  }
-
-  // Teams erzeugen
   document.getElementById("generateBtn").addEventListener("click", () => {
     messageBox.style.display = "none";
     messageBox.textContent = "";
@@ -533,29 +498,16 @@
 
     const gks = activePlayers.filter(p => p.isGoalkeeper);
     if (gks.length < teamCount) {
-      showMessage(
-        "Achtung: Nur " + gks.length +
-        " Torhüter für " + teamCount +
-        " Teams aktiv – einige Teams haben keinen TW.",
-        true
-      );
+      showMessage("Achtung: Nur " + gks.length + " Torhüter für " + teamCount + " Teams aktiv – einige Teams haben keinen TW.", true);
     }
 
-    // Jannik & Julian finden (nach Namen, nicht case-sensitiv)
-    const jannik = activePlayers.find(
-      p => p.name.toLowerCase().startsWith("jannik")
-    );
-    const julian = activePlayers.find(
-      p => p.name.toLowerCase().startsWith("julian")
-    );
+    const jannik = activePlayers.find(p => p.name.toLowerCase().startsWith("jannik"));
+    const julian = activePlayers.find(p => p.name.toLowerCase().startsWith("julian"));
 
     const defenders = activePlayers.filter(p => !p.isGoalkeeper && p.role === "defense");
     const offensives = activePlayers.filter(p => !p.isGoalkeeper && p.role === "offense");
-    const others = activePlayers.filter(
-      p => !p.isGoalkeeper && (p.role === "neutral" || !p.role)
-    );
+    const others = activePlayers.filter(p => !p.isGoalkeeper && (p.role === "neutral" || !p.role));
 
-    // Damit sie später nicht doppelt verteilt werden
     if (jannik && !jannik.isGoalkeeper) {
       removeFromArray(defenders, jannik);
       removeFromArray(offensives, jannik);
@@ -567,13 +519,9 @@
       removeFromArray(others, julian);
     }
 
-    // Teams initialisieren
     const teams = [];
-    for (let i = 0; i < teamCount; i++) {
-      teams.push({ players: [], totalStrength: 0, defenders: 0 });
-    }
+    for (let i = 0; i < teamCount; i++) teams.push({ players: [], totalStrength: 0, defenders: 0 });
 
-    // 1. Torhüter zufällig verteilen (max. einer pro Team)
     const shuffledGks = shuffleArray(gks);
     for (let i = 0; i < teamCount && i < shuffledGks.length; i++) {
       const gk = shuffledGks[i];
@@ -581,24 +529,17 @@
       teams[i].totalStrength += gk.strength;
     }
 
-    // 2. Spezialregel: Jannik & Julian nie in gleichem Team (nur wenn ≥2 Teams & beide Feldspieler aktiv)
     if (teamCount >= 2 && jannik && julian && !jannik.isGoalkeeper && !julian.isGoalkeeper) {
-      // Jannik in zufälliges Team
       const jannikTeamIndex = Math.floor(Math.random() * teams.length);
       placeSpecialPlayer(jannik, jannikTeamIndex, teams);
-
-      // Julian in anderes Team
       const possibleTeams = [...Array(teams.length).keys()].filter(i => i !== jannikTeamIndex);
       const julianTeamIndex = possibleTeams[Math.floor(Math.random() * possibleTeams.length)];
       placeSpecialPlayer(julian, julianTeamIndex, teams);
     } else {
-      // Wenn nur 1 Team: Hinweis, Regel kann nicht eingehalten werden
       if (teamCount === 1 && jannik && julian) {
         showMessage("Hinweis: Mit nur einem Team können Jannik & Julian nicht getrennt werden.", true);
       }
-      // Wenn nur einer aktiv: wird ganz normal später im Pool verteilt
       if (jannik && !jannik.isGoalkeeper && (!julian || teamCount === 1)) {
-        // wieder in seinen Pool zurückschieben
         if (jannik.role === "defense") defenders.push(jannik);
         else if (jannik.role === "offense") offensives.push(jannik);
         else others.push(jannik);
@@ -610,13 +551,9 @@
       }
     }
 
-    // 3. Verteidiger (ungefähr gleich / mit Zufall)
     distributeDefenseRandom(defenders, teams);
-
-    // 4. Offensiv & Allround (weicher Ausgleich + Zufall)
     distributeRandomWithStrength(offensives, teams);
     distributeRandomWithStrength(others, teams);
-
     renderTeams(teams);
   });
 
@@ -635,20 +572,14 @@
       card.className = "team-card";
 
       const totalPlayers = team.players.length;
-      const avgStrength = totalPlayers
-        ? (team.totalStrength / totalPlayers).toFixed(1)
-        : "0.0";
+      const avgStrength = totalPlayers ? (team.totalStrength / totalPlayers).toFixed(1) : "0.0";
 
       const title = document.createElement("h3");
       title.textContent = "Team " + (idx + 1);
       card.appendChild(title);
 
       const info = document.createElement("small");
-      info.textContent =
-        "Spieler: " + totalPlayers +
-        " · Gesamtpunkte: " + team.totalStrength +
-        " · Ø Stärke: " + avgStrength +
-        " · Defensiv: " + team.defenders;
+      info.textContent = "Spieler: " + totalPlayers + " · Gesamtpunkte: " + team.totalStrength + " · Ø Stärke: " + avgStrength + " · Defensiv: " + team.defenders;
       card.appendChild(info);
 
       const list = document.createElement("ul");
@@ -657,15 +588,10 @@
       team.players.forEach(p => {
         const li = document.createElement("li");
         let badges = "";
-        if (p.isGoalkeeper) {
-          badges += "<span class='badge badge-gk'>TW</span> ";
-        }
+        if (p.isGoalkeeper) badges += "<span class='badge badge-gk'>TW</span> ";
         if (!p.isGoalkeeper) {
-          if (p.role === "defense") {
-            badges += "<span class='badge badge-def'>DEF</span> ";
-          } else if (p.role === "offense") {
-            badges += "<span class='badge badge-off'>OFF</span> ";
-          }
+          if (p.role === "defense") badges += "<span class='badge badge-def'>DEF</span> ";
+          else if (p.role === "offense") badges += "<span class='badge badge-off'>OFF</span> ";
         }
         li.innerHTML = badges + p.name + " (" + p.strength + ")";
         list.appendChild(li);
@@ -679,7 +605,6 @@
     teamsOutput.appendChild(container);
   }
 
-  // Speicher leeren
   document.getElementById("clearStorageBtn").addEventListener("click", () => {
     if (confirm("Wirklich gespeicherte Daten (Spielerliste) löschen?")) {
       localStorage.removeItem(STORAGE_KEY);
@@ -690,7 +615,6 @@
     }
   });
 
-  // Init
   loadPlayers();
   renderPlayers();
 </script>
